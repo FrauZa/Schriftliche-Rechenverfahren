@@ -24,6 +24,17 @@ let subtractionGameState = {
     selectedNumber: null
 };
 
+let multiplicationGameState = {
+    mode: '3x2',
+    score: 0,
+    timeLeft: 600,
+    timerInterval: null,
+    isPlaying: false,
+    currentTask: null,
+    colorSupport: false,
+    selectedNumber: null
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     console.log('Mathe-Trainer v2.2 geladen');
 
@@ -62,6 +73,20 @@ function toggleColorSupportSubtraction() {
     const text = btn.querySelector('.toggle-text');
 
     if (subtractionGameState.colorSupport) {
+        btn.classList.add('active');
+        text.textContent = "Farbige Unterstützung aktiv";
+    } else {
+        btn.classList.remove('active');
+        text.textContent = "Farbige Unterstützung einschalten";
+    }
+}
+
+function toggleColorSupportMultiplication() {
+    multiplicationGameState.colorSupport = !multiplicationGameState.colorSupport;
+    const btn = document.getElementById('colorSupportBtnMultiplication');
+    const text = btn.querySelector('.toggle-text');
+
+    if (multiplicationGameState.colorSupport) {
         btn.classList.add('active');
         text.textContent = "Farbige Unterstützung aktiv";
     } else {
@@ -177,6 +202,64 @@ function updateTimerDisplaySubtraction() {
 
 function updateScoreDisplaySubtraction() {
     document.getElementById('subtractionScore').textContent = subtractionGameState.score;
+}
+
+/* ============================================
+   MULTIPLIKATION - Steuerung
+   ============================================ */
+function startMultiplicationExercise(mode) {
+    multiplicationGameState.mode = mode;
+    multiplicationGameState.score = 0;
+    multiplicationGameState.timeLeft = 600;
+    multiplicationGameState.isPlaying = true;
+    multiplicationGameState.selectedNumber = null;
+
+    updateScoreDisplayMultiplication();
+    updateTimerDisplayMultiplication();
+
+    showScreen('multiplicationScreen');
+
+    const titles = {
+        '3x1': 'Einstellige Multiplikation',
+        '3x10': 'Multiplikation mit Zehnerzahl',
+        '3x2': 'Zweistellige Multiplikation',
+        '4x3': 'Dreistellige Multiplikation'
+    };
+    document.getElementById('multiplicationTitle').textContent = titles[mode];
+
+    if (multiplicationGameState.timerInterval) clearInterval(multiplicationGameState.timerInterval);
+    multiplicationGameState.timerInterval = setInterval(gameTickMultiplication, 1000);
+
+    generateMultiplicationTask();
+}
+
+function stopGameMultiplication() {
+    multiplicationGameState.isPlaying = false;
+    clearInterval(multiplicationGameState.timerInterval);
+    document.getElementById('finalScoreValueMultiplication').textContent = multiplicationGameState.score;
+    const msg = document.getElementById('motivationalMessageMultiplication');
+    if (multiplicationGameState.score >= 100) msg.textContent = "Wow! Du bist ein echtes Multiplikations-Ass! 🏆";
+    else if (multiplicationGameState.score >= 50) msg.textContent = "Super gemacht! Das war klasse! 🌟";
+    else msg.textContent = "Schon gut! Übe weiter, dann wirst du immer schneller! 💪";
+    showScreen('resultScreenMultiplication');
+}
+
+function gameTickMultiplication() {
+    if (!multiplicationGameState.isPlaying) return;
+    multiplicationGameState.timeLeft--;
+    updateTimerDisplayMultiplication();
+    if (multiplicationGameState.timeLeft <= 0) stopGameMultiplication();
+}
+
+function updateTimerDisplayMultiplication() {
+    const min = Math.floor(multiplicationGameState.timeLeft / 60);
+    const sec = multiplicationGameState.timeLeft % 60;
+    document.getElementById('timerDisplayMultiplication').textContent =
+        `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+}
+
+function updateScoreDisplayMultiplication() {
+    document.getElementById('multiplicationScore').textContent = multiplicationGameState.score;
 }
 
 /* ============================================
@@ -727,6 +810,8 @@ function setupInputMethod() {
 
 function selectNumber(val) {
     gameState.selectedNumber = val;
+    subtractionGameState.selectedNumber = val; // Synchronize with subtraction
+    multiplicationGameState.selectedNumber = val; // Synchronize with multiplication
     document.querySelectorAll('.draggable-number').forEach(el => {
         el.classList.toggle('selected', el.dataset.value === val);
     });
@@ -778,10 +863,250 @@ function handleInputSubtraction(targetZone, value) {
     }
 }
 
+/* ============================================
+   MULTIPLIKATION - Logik & Rendering
+   ============================================ */
+const MultiplicationLogic = {
+    generateTask(mode) {
+        let num1, num2;
+        if (mode === '3x1') {
+            num1 = Math.floor(Math.random() * 900) + 100;
+            num2 = Math.floor(Math.random() * 9) + 1;
+        } else if (mode === '3x10') {
+            num1 = Math.floor(Math.random() * 900) + 100;
+            num2 = (Math.floor(Math.random() * 9) + 1) * 10;
+        } else if (mode === '3x2') {
+            num1 = Math.floor(Math.random() * 900) + 100;
+            num2 = Math.floor(Math.random() * 90) + 10;
+        } else {
+            num1 = Math.floor(Math.random() * 9000) + 1000;
+            num2 = Math.floor(Math.random() * 900) + 100;
+        }
+        return { num1, num2 };
+    },
+
+    calculateSolution(num1, num2) {
+        const digits2 = String(num2).split('').map(Number);
+        const steps = [];
+        for (let i = 0; i < digits2.length; i++) {
+            const digit = digits2[i];
+            const powerOfTen = digits2.length - 1 - i;
+            const product = num1 * digit * Math.pow(10, powerOfTen);
+            steps.push({ digit, powerOfTen, value: product });
+        }
+        const finalResult = num1 * num2;
+        return { num1, num2, steps, finalResult, totalLength: String(finalResult).length };
+    }
+};
+
+function generateMultiplicationTask() {
+    const feedbackArea = document.querySelector('#multiplicationScreen .feedback-area');
+    if (feedbackArea) feedbackArea.style.display = 'none';
+
+    const raw = MultiplicationLogic.generateTask(multiplicationGameState.mode);
+    multiplicationGameState.currentTask = MultiplicationLogic.calculateSolution(raw.num1, raw.num2);
+
+    renderMultiplicationTask();
+}
+
+function renderMultiplicationTask() {
+    const container = document.getElementById('multiplicationTaskContainer');
+    container.innerHTML = '';
+    const task = multiplicationGameState.currentTask;
+
+    const num1Str = String(task.num1);
+    const num2Str = String(task.num2);
+    const taskStr = `${num1Str}×${num2Str}`;
+    const totalWidth = Math.max(task.totalLength, taskStr.length) + 1;
+
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = `repeat(${totalWidth}, 50px)`;
+    container.style.gap = '5px';
+
+    // 1. Aufgabenzeile
+    const taskPadding = totalWidth - taskStr.length;
+    for (let i = 0; i < taskPadding; i++) container.appendChild(createGridCell('', 'borderless'));
+
+    num1Str.split('').forEach(char => container.appendChild(createGridCell(char, 'digit-box constant')));
+    container.appendChild(createGridCell('×', 'operator constant'));
+    num2Str.split('').forEach((char, idx) => {
+        const p10 = num2Str.length - 1 - idx;
+        let colorClass = '';
+        if (multiplicationGameState.colorSupport) {
+            if (p10 === 0) colorClass = ' color-ones';
+            else if (p10 === 1) colorClass = ' color-tens';
+            else if (p10 === 2) colorClass = ' color-hundreds';
+        }
+        container.appendChild(createGridCell(char, `digit-box constant${colorClass}`));
+    });
+
+    // Trennlinie 1
+    const line1 = document.createElement('div');
+    line1.className = 'calc-line';
+    line1.style.gridColumn = `1 / span ${totalWidth}`;
+    line1.style.width = '100%';
+    line1.style.height = '3px';
+    line1.style.backgroundColor = '#333';
+    container.appendChild(line1);
+
+    // 2. Zwischenschritte (nur wenn num2 > 9)
+    if (task.num2 > 9 || task.num2 === 10 || multiplicationGameState.mode === '3x10') {
+        task.steps.forEach(step => {
+            const valStr = String(step.value);
+            const padding = totalWidth - valStr.length;
+
+            for (let i = 0; i < totalWidth; i++) {
+                if (i < padding) {
+                    container.appendChild(createGridCell('', 'borderless'));
+                } else {
+                    const digitIdx = i - padding;
+                    const isTrailingZero = (digitIdx >= valStr.length - step.powerOfTen);
+                    if (isTrailingZero) {
+                        container.appendChild(createGridCell('0', 'digit-box constant muted'));
+                    } else {
+                        container.appendChild(createGridCell('', 'result-box empty', { expected: valStr[digitIdx] }));
+                    }
+                }
+            }
+        });
+
+        // Trennlinie 2
+        const line2 = document.createElement('div');
+        line2.className = 'calc-line';
+        line2.style.gridColumn = `1 / span ${totalWidth}`;
+        line2.style.width = '100%';
+        line2.style.height = '3px';
+        line2.style.backgroundColor = '#333';
+        container.appendChild(line2);
+    }
+
+    // 3. Ergebniszeile
+    const sumStr = String(task.finalResult);
+    const sumPadding = totalWidth - sumStr.length;
+    for (let i = 0; i < totalWidth; i++) {
+        if (i < sumPadding) {
+            container.appendChild(createGridCell('', 'borderless'));
+        } else {
+            container.appendChild(createGridCell('', 'result-box empty', { expected: sumStr[i - sumPadding] }));
+        }
+    }
+
+    setupDropZonesMultiplication();
+}
+
+function createGridCell(content, className, data = null) {
+    const div = document.createElement('div');
+    div.className = className;
+    div.textContent = content;
+
+    // Explicit styles for grid cells if not already in CSS
+    if (className.includes('digit-box') || className.includes('result-box')) {
+        div.style.width = '50px';
+        div.style.height = '60px';
+        div.style.lineHeight = '60px';
+        div.style.textAlign = 'center';
+        div.style.fontSize = '2rem';
+        div.style.fontWeight = '600';
+        div.style.fontFamily = 'Courier New, monospace';
+        div.style.border = className.includes('borderless') ? 'none' : '2px solid #bdbdbd';
+        div.style.borderRadius = '8px';
+        div.style.background = className.includes('constant') ? '#fff' : '#f1f8f4';
+    }
+
+    if (className.includes('result-box')) {
+        div.classList.add('multiplication-result-box');
+        div.style.borderWidth = '3px';
+        div.style.borderColor = '#FFA726';
+    }
+
+    if (className.includes('muted')) {
+        div.style.opacity = '0.4';
+    }
+
+    if (data) {
+        div.dataset.expected = data.expected;
+    }
+    return div;
+}
+
+function setupDropZonesMultiplication() {
+    document.querySelectorAll('#multiplicationTaskContainer .result-box').forEach(zone => {
+        zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const val = e.dataTransfer.getData('text/plain') || draggedValue;
+            if (val) handleInputMultiplication(zone, val);
+        });
+        zone.addEventListener('click', () => {
+            if (multiplicationGameState.selectedNumber !== null) handleInputMultiplication(zone, multiplicationGameState.selectedNumber);
+        });
+    });
+
+    // Carry Box large
+    const carryBox = document.getElementById('activeCarryMultiplication');
+    carryBox.addEventListener('click', () => {
+        if (multiplicationGameState.selectedNumber !== null) carryBox.textContent = multiplicationGameState.selectedNumber;
+    });
+    carryBox.addEventListener('dragover', (e) => e.preventDefault());
+    carryBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const val = e.dataTransfer.getData('text/plain') || draggedValue;
+        if (val) carryBox.textContent = val;
+    });
+}
+
+function handleInputMultiplication(zone, value) {
+    if (multiplicationGameState.isPlaying && !zone.classList.contains('correct')) {
+        zone.textContent = value;
+        validateInputMultiplication(zone, value);
+    }
+}
+
+function validateInputMultiplication(zone, value) {
+    if (value == zone.dataset.expected) {
+        zone.classList.remove('wrong');
+        zone.classList.add('correct');
+        // Apply success styles manually as well
+        zone.style.borderColor = '#2e7d32';
+        zone.style.background = '#c8e6c9';
+        zone.style.color = '#1b5e20';
+
+        // Auto-clear carry box
+        document.getElementById('activeCarryMultiplication').textContent = '';
+
+        checkFullCompletionMultiplication();
+    } else {
+        zone.classList.add('wrong');
+        setTimeout(() => { if (!zone.classList.contains('correct')) { zone.classList.remove('wrong'); zone.textContent = ''; } }, 800);
+    }
+}
+
+function checkFullCompletionMultiplication() {
+    const emptyCells = document.querySelectorAll('#multiplicationTaskContainer .empty');
+    if (emptyCells.length === 0) return;
+
+    const allCorrect = Array.from(emptyCells).every(c => c.classList.contains('correct'));
+
+    if (allCorrect) {
+        multiplicationGameState.score += 10;
+        updateScoreDisplayMultiplication();
+        const feedback = document.querySelector('#multiplicationScreen .feedback-area');
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.querySelector('.feedback-text').textContent = 'Super gemacht! +10 Punkte';
+        }
+        setTimeout(generateMultiplicationTask, 2000);
+    }
+}
+
 // Global Exports
 window.showScreen = showScreen;
 window.toggleColorSupport = toggleColorSupport;
 window.toggleColorSupportSubtraction = toggleColorSupportSubtraction;
+window.toggleColorSupportMultiplication = toggleColorSupportMultiplication;
 window.startAdditionExercise = startAdditionExercise;
 window.startSubtractionExercise = startSubtractionExercise;
+window.startMultiplicationExercise = startMultiplicationExercise;
 window.openMultiplicationApp = function () { window.location.href = '../schriftliche Multiplikation- zweistellige Zahl/index.html'; };

@@ -32,7 +32,7 @@
                     <span class="emoji">➖</span>
                     <span class="text">Schriftlich subtrahieren</span>
                 </button>
-                <button class="operation-btn multiplication" onclick="openMultiplicationApp()">
+                <button class="operation-btn multiplication" onclick="showScreen('multiplicationSelectionScreen')">
                     <span class="emoji">✖️</span>
                     <span class="text">Schriftlich multiplizieren</span>
                 </button>
@@ -255,56 +255,120 @@
             </div>
         </div>
     </div>
-    <div id="multiplicationScreen" class="screen exercise-screen">
+    <!-- Screen: Auswahl Multiplikation -->
+    <div id="multiplicationSelectionScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="showScreen('startScreen')">
                 <span class="arrow">←</span> Zurück
             </button>
-            <div class="progress">Punkte: <span id="multiplicationScore">0/0</span></div>
+        </div>
+        <div class="content">
+            <div class="mode-selection-container multiplication-border">
+                <h2 class="exercise-title multiplication-color">Schriftlich multiplizieren</h2>
+                <p class="description text-white">Wähle, welche Aufgaben du üben möchtest.</p>
+
+                <div class="button-grid">
+                    <button class="operation-btn multiplication" onclick="startMultiplicationExercise('3x1')">
+                        <span class="emoji">1️⃣</span>
+                        <span class="text">Einstellige Zahl<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 345
+                                × 7)</small></span>
+                    </button>
+                    <button class="operation-btn multiplication" onclick="startMultiplicationExercise('3x10')">
+                        <span class="emoji">🔟</span>
+                        <span class="text">Zehnerzahl<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 345 ×
+                                70)</small></span>
+                    </button>
+                    <button class="operation-btn multiplication" onclick="startMultiplicationExercise('3x2')">
+                        <span class="emoji">2️⃣</span>
+                        <span class="text">Zweistellige Zahl<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B.
+                                345 × 26)</small></span>
+                    </button>
+                    <button class="operation-btn multiplication" onclick="startMultiplicationExercise('4x3')">
+                        <span class="emoji">3️⃣</span>
+                        <span class="text">Dreistellige Zahl<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B.
+                                1234 × 567)</small></span>
+                    </button>
+                </div>
+
+                <div class="toggle-container-large">
+                    <button id="colorSupportBtnMultiplication" class="big-toggle-btn"
+                        onclick="toggleColorSupportMultiplication()">
+                        <span class="toggle-icon">🎨</span>
+                        <span class="toggle-text">Farbige Unterstützung einschalten</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Schriftlich multiplizieren (Game) -->
+    <div id="multiplicationScreen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('multiplicationSelectionScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="timer-display" id="timerDisplayMultiplication">10:00</div>
+            <div class="progress">Punkte: <span id="multiplicationScore">0</span></div>
         </div>
 
         <div class="content">
-            <h2 class="exercise-title multiplication-color">Schriftlich multiplizieren üben</h2>
-            <p class="description">Hier lernst du, schriftlich zu multiplizieren.</p>
+            <h2 class="exercise-title multiplication-color" id="multiplicationTitle">Schriftlich multiplizieren</h2>
+            <p class="description">Fülle die Lücken in der Rechnung aus.</p>
 
             <div class="task-area">
-                <h3>Aufgabe:</h3>
-                <div class="written-calculation multiplication-calc">
-                    <div class="calc-row">
-                        <span class="digit-box">3</span>
-                        <span class="digit-box">2</span>
-                        <span class="digit-box">4</span>
+                <div class="math-layout" style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <div id="multiplicationTaskContainer" class="multiplication-grid-container"
+                        style="display: grid; gap: 0; font-family: 'Courier New', monospace; font-size: 2rem; font-weight: 600;">
+                        <!-- Grid will be injected here -->
                     </div>
-                    <div class="calc-row">
-                        <span class="operator">×</span>
-                        <span class="digit-box"></span>
-                        <span class="digit-box"></span>
-                        <span class="digit-box">6</span>
-                    </div>
-                    <div class="calc-line"></div>
-                    <div class="calc-row result-row">
-                        <input type="text" class="result-box" maxlength="1" />
-                        <input type="text" class="result-box" maxlength="1" />
-                        <input type="text" class="result-box" maxlength="1" />
-                        <input type="text" class="result-box" maxlength="1" />
-                    </div>
-                    <div class="carry-row">
-                        <small>Übertrag:</small>
-                        <input type="text" class="carry-box" maxlength="1" />
-                        <input type="text" class="carry-box" maxlength="1" />
-                        <input type="text" class="carry-box" maxlength="1" />
-                        <input type="text" class="carry-box" maxlength="1" />
+
+                    <div class="active-carry-area" style="text-align: center;">
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">Aktuelle Merkzahl (optional)</p>
+                        <div id="activeCarryMultiplication" class="carry-box-large"
+                            style="width: 60px; height: 60px; border: 2px dashed #FFA726; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; color: #F57C00; background: #fffcf5; cursor: pointer;">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="feedback-area">
-                <p class="feedback-text">Trage deine Lösung ein und klicke auf "Prüfen".</p>
+            <!-- Drag-Bar mit Ziffern -->
+            <div class="drag-bar-container">
+                <div class="drag-bar">
+                    <div class="draggable-number" draggable="true" data-value="0">0</div>
+                    <div class="draggable-number" draggable="true" data-value="1">1</div>
+                    <div class="draggable-number" draggable="true" data-value="2">2</div>
+                    <div class="draggable-number" draggable="true" data-value="3">3</div>
+                    <div class="draggable-number" draggable="true" data-value="4">4</div>
+                    <div class="draggable-number" draggable="true" data-value="5">5</div>
+                    <div class="draggable-number" draggable="true" data-value="6">6</div>
+                    <div class="draggable-number" draggable="true" data-value="7">7</div>
+                    <div class="draggable-number" draggable="true" data-value="8">8</div>
+                    <div class="draggable-number" draggable="true" data-value="9">9</div>
+                </div>
             </div>
 
+            <div class="feedback-area" style="display:none;">
+                <p class="feedback-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Ergebnis Multiplikation -->
+    <div id="resultScreenMultiplication" class="screen">
+        <div class="content" style="text-align: center;">
+            <h2 class="exercise-title multiplication-color">Runde beendet!</h2>
+            <div class="final-score" style="font-size: 2rem; margin: 40px 0;">
+                <span class="emoji" style="display:block; font-size:4rem; margin-bottom:10px;">🏆</span>
+                <p>Du hast <strong id="finalScoreValueMultiplication"
+                        style="color:var(--color-multiplication); font-size:3rem;">0</strong>
+                    Punkte gesammelt.</p>
+            </div>
+            <p id="motivationalMessageMultiplication" class="description" style="font-size: 1.5rem;">Gut gemacht!</p>
+
             <div class="button-area">
-                <button class="check-btn multiplication-color">Prüfen</button>
-                <button class="next-btn multiplication-color">Nächste Aufgabe</button>
+                <button class="check-btn multiplication-color"
+                    onclick="showScreen('multiplicationSelectionScreen')">Nochmal
+                    spielen</button>
             </div>
         </div>
     </div>
