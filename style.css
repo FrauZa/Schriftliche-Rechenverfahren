@@ -1,0 +1,819 @@
+/* ============================================
+   CSS Variables - Farben für die 4 Rechenarten
+   ============================================ */
+:root {
+    --color-addition: #66BB6A;
+    --color-addition-light: #A5D6A7;
+    --color-subtraction: #42A5F5;
+    --color-subtraction-light: #90CAF9;
+    --color-multiplication: #FFA726;
+    --color-multiplication-light: #FFCC80;
+    --color-division: #AB47BC;
+    --color-division-light: #CE93D8;
+
+    --color-text: #333;
+    --color-bg: #f5f5f5;
+    --color-white: #ffffff;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   Basis-Styles
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', 'Comic Sans MS', cursive, sans-serif;
+    /* background-color removed to show image */
+    color: var(--color-text);
+    overflow-x: hidden;
+}
+
+/* ============================================
+   Screen-Management
+   ============================================ */
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   Startbildschirm
+   ============================================ */
+#startScreen {
+    position: relative;
+}
+
+.background-placeholder {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.85;
+    z-index: -1;
+}
+
+/* Fallback gradient if image doesn't load */
+.background-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0.3;
+    z-index: -1;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    width: 100%;
+}
+
+.main-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-white);
+    text-align: center;
+    margin-bottom: 60px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    padding: 20px;
+}
+
+.operation-btn {
+    min-width: 180px;
+    min-height: 180px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: var(--color-white);
+}
+
+.operation-btn .emoji {
+    font-size: 3.5rem;
+}
+
+.operation-btn .text {
+    font-size: 1.3rem;
+    line-height: 1.3;
+}
+
+.operation-btn.addition {
+    background: linear-gradient(135deg, var(--color-addition) 0%, var(--color-addition-light) 100%);
+}
+
+.operation-btn.subtraction {
+    background: linear-gradient(135deg, var(--color-subtraction) 0%, var(--color-subtraction-light) 100%);
+}
+
+.operation-btn.multiplication {
+    background: linear-gradient(135deg, var(--color-multiplication) 0%, var(--color-multiplication-light) 100%);
+}
+
+.operation-btn.division {
+    background: linear-gradient(135deg, var(--color-division) 0%, var(--color-division-light) 100%);
+}
+
+.operation-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: var(--shadow-hover);
+}
+
+.operation-btn:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* ============================================
+   Exercise Screens (alle 4 Rechenarten)
+   ============================================ */
+.exercise-screen .content {
+    max-width: 800px;
+    width: 100%;
+    background: var(--color-white);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    background: #757575;
+    color: var(--color-white);
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #616161;
+    transform: translateY(-2px);
+}
+
+.back-btn .arrow {
+    font-size: 1.3rem;
+    margin-right: 5px;
+}
+
+.progress {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.exercise-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.addition-color {
+    color: var(--color-addition);
+}
+
+.subtraction-color {
+    color: var(--color-subtraction);
+}
+
+.multiplication-color {
+    color: var(--color-multiplication);
+}
+
+.division-color {
+    color: var(--color-division);
+}
+
+.description {
+    font-size: 1.1rem;
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* ============================================
+   Aufgabenbereich
+   ============================================ */
+.task-area {
+    background: #fafafa;
+    border: 3px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 25px;
+}
+
+.task-area h3 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: var(--color-text);
+}
+
+.written-calculation {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.calc-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.digit-box {
+    display: inline-block;
+    width: 50px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    background: var(--color-white);
+    border: 2px solid #bdbdbd;
+    border-radius: 8px;
+    font-size: 2rem;
+}
+
+.operator {
+    width: 30px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.calc-line {
+    width: 100%;
+    height: 3px;
+    background: var(--color-text);
+    margin: 5px 0;
+}
+
+.result-box {
+    width: 50px;
+    height: 60px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    border: 3px solid #4CAF50;
+    border-radius: 8px;
+    background: #f1f8f4;
+    transition: all 0.3s ease;
+}
+
+.result-box:focus {
+    outline: none;
+    border-color: #2e7d32;
+    background: var(--color-white);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+.result-box.small {
+    width: 40px;
+    height: 50px;
+    font-size: 1.6rem;
+}
+
+.carry-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 5px;
+    /* Moved from margin-top to bottom since it's now at the top */
+    min-height: 40px;
+    /* Ensure space is reserved even if empty */
+    justify-content: flex-end;
+    /* Align to the right relative to column, but we usually want alignment with digits */
+    /* Actually with flex column of calc-rows, if we want them right aligned, we need to handle that in the parent or ensure full width. 
+       For now, we rely on the JS to generate the correct number of boxes to match the columns. */
+}
+
+.carry-row small {
+    font-size: 0.9rem;
+    color: #999;
+    margin-right: 10px;
+}
+
+.carry-box {
+    width: 50px;
+    /* Match digit-box width for alignment */
+    height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    border: 1px dashed #bdbdbd;
+    /* Dashed border for "optional" feel */
+    border-radius: 6px;
+    background: #fff;
+    color: #d32f2f;
+    /* Red color for carry to distinguish */
+}
+
+.carry-box:focus {
+    outline: none;
+    border: 2px solid #66BB6A;
+    background: var(--color-white);
+}
+
+/* Division spezifisches Layout */
+.division-layout {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 2rem;
+}
+
+.dividend,
+.divisor,
+.quotient {
+    display: flex;
+    gap: 10px;
+}
+
+.divisor-symbol,
+.equals {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+/* ============================================
+   Feedback & Buttons
+   ============================================ */
+.feedback-area {
+    min-height: 60px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #e3f2fd;
+    border-left: 5px solid #2196F3;
+    border-radius: 8px;
+}
+
+.feedback-text {
+    font-size: 1.1rem;
+    color: var(--color-text);
+}
+
+.button-area {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.check-btn,
+.next-btn {
+    padding: 15px 40px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--color-white);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.check-btn.addition-color {
+    background: var(--color-addition);
+}
+
+.check-btn.subtraction-color {
+    background: var(--color-subtraction);
+}
+
+.check-btn.multiplication-color {
+    background: var(--color-multiplication);
+}
+
+.check-btn.division-color {
+    background: var(--color-division);
+}
+
+.next-btn.addition-color {
+    background: linear-gradient(135deg, var(--color-addition) 0%, var(--color-addition-light) 100%);
+}
+
+.next-btn.subtraction-color {
+    background: linear-gradient(135deg, var(--color-subtraction) 0%, var(--color-subtraction-light) 100%);
+}
+
+.next-btn.multiplication-color {
+    background: linear-gradient(135deg, var(--color-multiplication) 0%, var(--color-multiplication-light) 100%);
+}
+
+.next-btn.division-color {
+    background: linear-gradient(135deg, var(--color-division) 0%, var(--color-division-light) 100%);
+}
+
+.check-btn:hover,
+.next-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.check-btn:active,
+.next-btn:active {
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   Timer & Drag UI
+   ============================================ */
+.timer-display {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--color-text);
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 12px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e0e0e0;
+}
+
+.drag-bar-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+.drag-bar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px;
+    flex-wrap: nowrap;
+    /* Alle in einer Zeile */
+    min-width: max-content;
+    /* Damit sie nicht gequetscht werden */
+}
+
+.draggable-number {
+    width: 60px;
+    height: 80px;
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    font-family: 'Outfit', sans-serif;
+    flex-shrink: 0;
+    /* Verhindert Schrumpfen */
+}
+
+/* Selected State für Click-to-Fill */
+.draggable-number.selected {
+    border: 3px solid #333;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 152, 0, 0.8);
+}
+
+.draggable-number:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.draggable-number:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Modifizierte Input-Boxen für Drop-Zones */
+.result-box,
+.carry-box {
+    cursor: default;
+    /* Kein Tippen mehr */
+    pointer-events: auto;
+    /* Muss events empfangen können für Drop */
+    caret-color: transparent;
+    /* Cursor verstecken */
+}
+
+/* Drop-Ziel-Highlight */
+.result-box.drag-over,
+.carry-box.drag-over {
+    background: #e1f5fe;
+    border-color: #039BE5;
+    transform: scale(1.1);
+}
+
+/* Feedback Farben */
+.result-box.correct {
+    background: #c8e6c9;
+    border-color: #2e7d32;
+    color: #1b5e20;
+}
+
+.result-box.wrong {
+    background: #ffcdd2;
+    border-color: #c62828;
+    animation: shake 0.4s;
+}
+
+.carry-box.correct {
+    border-color: #2e7d32;
+    background: #f1f8e9;
+    color: #1b5e20;
+}
+
+.carry-box.wrong {
+    border-color: #c62828;
+    background: #ffebee;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-5px);
+    }
+
+    40% {
+        transform: translateX(5px);
+    }
+
+    60% {
+        transform: translateX(-5px);
+    }
+
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+/* ============================================
+   Responsive Design (Erweitert)
+   ============================================ */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+
+    .button-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .operation-btn {
+        min-height: 150px;
+    }
+
+    .exercise-screen .content {
+        padding: 25px;
+    }
+
+    .exercise-title {
+        font-size: 1.8rem;
+    }
+
+    .button-area {
+        flex-direction: column;
+    }
+
+    .check-btn,
+    .next-btn {
+        width: 100%;
+    }
+
+    .timer-display {
+        font-size: 1.5rem;
+        padding: 5px 10px;
+    }
+
+    .draggable-number {
+        width: 45px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .digit-box,
+    .result-box {
+        width: 40px;
+        height: 50px;
+        font-size: 1.6rem;
+    }
+
+    .carry-box {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+
+    .written-calculation {
+        font-size: 1.6rem;
+    }
+}
+
+/* Farbige Unterstützung (Montessori-Farben) */
+.digit-box.color-ones {
+    color: #4CAF50 !important;
+    font-weight: bold;
+}
+
+/* Einer: Grün */
+.digit-box.color-tens {
+    color: #2196F3 !important;
+    font-weight: bold;
+}
+
+/* Zehner: Blau */
+.digit-box.color-hundreds {
+    color: #F44336 !important;
+    font-weight: bold;
+}
+
+/* Hunderter: Rot */
+.digit-box.color-thousands {
+    color: #4CAF50 !important;
+    font-weight: bold;
+}
+
+/* Tausender: Grün */
+
+/* Großer Toggle Button für Farb-Support */
+.toggle-container-large {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.big-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border: 3px solid #ddd;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    gap: 15px;
+}
+
+.big-toggle-btn.active {
+    background-color: #E8F5E9;
+    border-color: #4CAF50;
+    color: #2E7D32;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+}
+
+.big-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.big-toggle-btn .toggle-icon {
+    font-size: 1.5rem;
+}
+
+/* Container für Modus-Auswahl (Farbige Kästen) */
+.mode-selection-container {
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+
+.mode-selection-container.addition-border {
+    border: 5px solid var(--color-addition);
+    background-color: rgba(102, 187, 106, 0.1);
+    /* Etwas kräftigeres, aber immer noch sehr helles Transparent-Grün */
+}
+
+.mode-selection-container.subtraction-border {
+    border: 5px solid var(--color-subtraction);
+    background-color: rgba(66, 165, 245, 0.1);
+    /* Etwas kräftiger für Lesbarkeit von weißem Text */
+}
+
+.text-white {
+    color: var(--color-white) !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    /* Leichter Schatten für bessere Lesbarkeit auf hellem Hintergrund */
+}
+
+/* Klecksaufgaben Styling */
+.result-box.klecks {
+    background-color: #333;
+    background-image: radial-gradient(circle at 30% 30%, #444 0%, #111 70%, #000 100%);
+    border-color: #000;
+    color: transparent;
+    /* Versteckt die Ziffer solange sie falsch ist */
+    position: relative;
+    border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%;
+    /* Irreguläre Form für Klecks-Optik */
+    box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.1), 3px 3px 8px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.result-box.klecks:hover {
+    transform: scale(1.05) rotate(2deg);
+}
+
+.result-box.klecks.correct {
+    background-image: none;
+    background-color: #c8e6c9;
+    color: #1b5e20;
+    border-radius: 8px;
+    /* Zurück zur normalen Form wenn gelöst */
+    border-color: #2e7d32;
+}
+
+/* Endauswertung Styling (Transparent) */
+#resultScreen .content,
+#resultScreenSubtraction .content {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+#resultScreen .exercise-title,
+#resultScreenSubtraction .exercise-title,
+#resultScreen .final-score p,
+#resultScreenSubtraction .final-score p,
+#motivationalMessage,
+#motivationalMessageSubtraction {
+    color: var(--color-white) !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+#resultScreen .final-score strong,
+#resultScreenSubtraction .final-score strong {
+    color: var(--color-white) !important;
+    text-decoration: underline;
+}

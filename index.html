@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schriftliche Rechenverfahren üben</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Startbildschirm -->
+    <!-- Global Background -->
+    <div class="background-placeholder">
+        <!-- Platzhalter für Hintergrundbild -->
+    </div>
+
+    <!-- Startbildschirm -->
+    <div id="startScreen" class="screen active">
+        <div class="content">
+            <h1 class="main-title">Schriftliche Rechenverfahren üben</h1>
+            <div class="button-grid">
+                <button class="operation-btn addition" onclick="showScreen('additionSelectionScreen')">
+                    <span class="emoji">➕</span>
+                    <span class="text">Schriftlich addieren</span>
+                </button>
+                <button class="operation-btn subtraction" onclick="showScreen('subtractionSelectionScreen')">
+                    <span class="emoji">➖</span>
+                    <span class="text">Schriftlich subtrahieren</span>
+                </button>
+                <button class="operation-btn multiplication" onclick="openMultiplicationApp()">
+                    <span class="emoji">✖️</span>
+                    <span class="text">Schriftlich multiplizieren</span>
+                </button>
+                <button class="operation-btn division" onclick="showScreen('divisionScreen')">
+                    <span class="emoji">➗</span>
+                    <span class="text">Schriftlich dividieren</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Auswahl Addition -->
+    <div id="additionSelectionScreen" class="screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('startScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+        </div>
+        <div class="content">
+            <div class="mode-selection-container addition-border">
+                <h2 class="exercise-title addition-color">Schriftlich addieren</h2>
+                <p class="description text-white">Wähle, welche Aufgaben du üben möchtest.</p>
+
+                <div class="button-grid">
+                    <button class="operation-btn addition" onclick="startAdditionExercise('no-carry')">
+                        <span class="emoji">1️⃣</span>
+                        <span class="text">Ohne Übertrag</span>
+                    </button>
+                    <button class="operation-btn addition" onclick="startAdditionExercise('with-carry')">
+                        <span class="emoji">2️⃣</span>
+                        <span class="text">Mit Übertrag</span>
+                    </button>
+                    <button class="operation-btn addition" onclick="startAdditionExercise('multi-summands')">
+                        <span class="emoji">3️⃣</span>
+                        <span class="text">Mit mehreren Summanden</span>
+                    </button>
+                    <button class="operation-btn addition" onclick="startAdditionExercise('klecks')">
+                        <span class="emoji">🖋️</span>
+                        <span class="text">Klecksaufgaben</span>
+                    </button>
+                </div>
+
+                <div class="toggle-container-large">
+                    <button id="colorSupportBtn" class="big-toggle-btn" onclick="toggleColorSupport()">
+                        <span class="toggle-icon">🎨</span>
+                        <span class="toggle-text">Farbige Unterstützung einschalten</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Auswahl Subtraktion -->
+    <div id="subtractionSelectionScreen" class="screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('startScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+        </div>
+        <div class="content">
+            <div class="mode-selection-container subtraction-border">
+                <h2 class="exercise-title subtraction-color">Schriftlich subtrahieren</h2>
+                <p class="description text-white">Wähle, welche Aufgaben du üben möchtest.</p>
+
+                <div class="button-grid">
+                    <button class="operation-btn subtraction" onclick="startSubtractionExercise('no-borrow')">
+                        <span class="emoji">1️⃣</span>
+                        <span class="text">Ohne Übertrag</span>
+                    </button>
+                    <button class="operation-btn subtraction" onclick="startSubtractionExercise('with-borrow')">
+                        <span class="emoji">2️⃣</span>
+                        <span class="text">Mit Übertrag</span>
+                    </button>
+                    <button class="operation-btn subtraction" onclick="startSubtractionExercise('klecks')">
+                        <span class="emoji">🖋️</span>
+                        <span class="text">Klecksaufgaben</span>
+                    </button>
+                </div>
+
+                <div class="toggle-container-large">
+                    <button id="colorSupportBtnSubtraction" class="big-toggle-btn"
+                        onclick="toggleColorSupportSubtraction()">
+                        <span class="toggle-icon">🎨</span>
+                        <span class="toggle-text">Farbige Unterstützung einschalten</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Schriftlich addieren (Generic) -->
+    <div id="additionScreen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('additionSelectionScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="timer-display" id="timerDisplay">03:00</div>
+            <div class="progress">Richtig: <span id="additionScore">0</span></div>
+        </div>
+
+        <div class="content">
+            <h2 class="exercise-title addition-color" id="additionTitle">Schriftlich addieren</h2>
+            <p class="description" id="additionDescription">Ziehe die Zahlen in die richtigen Felder.</p>
+
+            <div class="task-area">
+                <h3>Aufgabe:</h3>
+                <!-- Container für dynamisch generierte Aufgabe -->
+                <div id="additionTaskContainer" class="written-calculation addition-calc">
+                    <!-- Wird per JS befüllt -->
+                </div>
+            </div>
+
+            <!-- Drag Bar mit Ziffern -->
+            <div class="drag-bar-container">
+                <div class="drag-bar">
+                    <div class="draggable-number" draggable="true" data-value="0">0</div>
+                    <div class="draggable-number" draggable="true" data-value="1">1</div>
+                    <div class="draggable-number" draggable="true" data-value="2">2</div>
+                    <div class="draggable-number" draggable="true" data-value="3">3</div>
+                    <div class="draggable-number" draggable="true" data-value="4">4</div>
+                    <div class="draggable-number" draggable="true" data-value="5">5</div>
+                    <div class="draggable-number" draggable="true" data-value="6">6</div>
+                    <div class="draggable-number" draggable="true" data-value="7">7</div>
+                    <div class="draggable-number" draggable="true" data-value="8">8</div>
+                    <div class="draggable-number" draggable="true" data-value="9">9</div>
+                </div>
+            </div>
+
+            <div class="feedback-area" style="display:none;">
+                <p class="feedback-text"></p>
+            </div>
+
+            <div class="button-area">
+                <button class="check-btn addition-color" id="additionCheckBtn" style="display: none;">Prüfen</button>
+                <button class="next-btn addition-color" id="additionNextBtn" style="display: none;">Nächste
+                    Aufgabe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Ergebnis / Rundenende -->
+    <div id="resultScreen" class="screen">
+        <div class="content" style="text-align: center;">
+            <h2 class="exercise-title addition-color">Runde beendet!</h2>
+            <div class="final-score" style="font-size: 2rem; margin: 40px 0;">
+                <span class="emoji" style="display:block; font-size:4rem; margin-bottom:10px;">🏆</span>
+                <p>Du hast <strong id="finalScoreValue" style="color:var(--color-addition); font-size:3rem;">0</strong>
+                    Aufgaben richtig gelöst.</p>
+            </div>
+            <p id="motivationalMessage" class="description" style="font-size: 1.5rem;">Gut gemacht!</p>
+
+            <div class="button-area">
+                <button class="check-btn addition-color" onclick="showScreen('additionSelectionScreen')">Nochmal
+                    spielen</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Screen: Schriftlich subtrahieren -->
+    <div id="subtractionScreen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('subtractionSelectionScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="timer-display" id="timerDisplaySubtraction">03:00</div>
+            <div class="progress">Richtig: <span id="subtractionScore">0</span></div>
+        </div>
+
+        <div class="content">
+            <h2 class="exercise-title subtraction-color" id="subtractionTitle">Schriftlich subtrahieren</h2>
+            <p class="description" id="subtractionDescription">Ziehe die Zahlen in die richtigen Felder.</p>
+
+            <div class="task-area">
+                <h3>Aufgabe:</h3>
+                <!-- Container für dynamisch generierte Aufgabe -->
+                <div id="subtractionTaskContainer" class="written-calculation subtraction-calc">
+                    <!-- Wird per JS befüllt -->
+                </div>
+            </div>
+
+            <div class="feedback-area" style="display:none;">
+                <p class="feedback-text">Feedback erscheint hier!</p>
+            </div>
+
+            <!-- Drag-Bar mit Ziffern -->
+            <div class="drag-bar-container">
+                <h3>Zahlen:</h3>
+                <div class="drag-bar">
+                    <div class="draggable-number" draggable="true" data-value="0">0</div>
+                    <div class="draggable-number" draggable="true" data-value="1">1</div>
+                    <div class="draggable-number" draggable="true" data-value="2">2</div>
+                    <div class="draggable-number" draggable="true" data-value="3">3</div>
+                    <div class="draggable-number" draggable="true" data-value="4">4</div>
+                    <div class="draggable-number" draggable="true" data-value="5">5</div>
+                    <div class="draggable-number" draggable="true" data-value="6">6</div>
+                    <div class="draggable-number" draggable="true" data-value="7">7</div>
+                    <div class="draggable-number" draggable="true" data-value="8">8</div>
+                    <div class="draggable-number" draggable="true" data-value="9">9</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Ergebnis Subtraktion -->
+    <div id="resultScreenSubtraction" class="screen">
+        <div class="content" style="text-align: center;">
+            <h2 class="exercise-title subtraction-color">Runde beendet!</h2>
+            <div class="final-score" style="font-size: 2rem; margin: 40px 0;">
+                <span class="emoji" style="display:block; font-size:4rem; margin-bottom:10px;">🏆</span>
+                <p>Du hast <strong id="finalScoreValueSubtraction"
+                        style="color:var(--color-subtraction); font-size:3rem;">0</strong>
+                    Aufgaben richtig gelöst.</p>
+            </div>
+            <p id="motivationalMessageSubtraction" class="description" style="font-size: 1.5rem;">Gut gemacht!</p>
+
+            <div class="button-area">
+                <button class="check-btn subtraction-color" onclick="showScreen('subtractionSelectionScreen')">Nochmal
+                    spielen</button>
+            </div>
+        </div>
+    </div>
+    <div id="multiplicationScreen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('startScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="progress">Punkte: <span id="multiplicationScore">0/0</span></div>
+        </div>
+
+        <div class="content">
+            <h2 class="exercise-title multiplication-color">Schriftlich multiplizieren üben</h2>
+            <p class="description">Hier lernst du, schriftlich zu multiplizieren.</p>
+
+            <div class="task-area">
+                <h3>Aufgabe:</h3>
+                <div class="written-calculation multiplication-calc">
+                    <div class="calc-row">
+                        <span class="digit-box">3</span>
+                        <span class="digit-box">2</span>
+                        <span class="digit-box">4</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="operator">×</span>
+                        <span class="digit-box"></span>
+                        <span class="digit-box"></span>
+                        <span class="digit-box">6</span>
+                    </div>
+                    <div class="calc-line"></div>
+                    <div class="calc-row result-row">
+                        <input type="text" class="result-box" maxlength="1" />
+                        <input type="text" class="result-box" maxlength="1" />
+                        <input type="text" class="result-box" maxlength="1" />
+                        <input type="text" class="result-box" maxlength="1" />
+                    </div>
+                    <div class="carry-row">
+                        <small>Übertrag:</small>
+                        <input type="text" class="carry-box" maxlength="1" />
+                        <input type="text" class="carry-box" maxlength="1" />
+                        <input type="text" class="carry-box" maxlength="1" />
+                        <input type="text" class="carry-box" maxlength="1" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-area">
+                <p class="feedback-text">Trage deine Lösung ein und klicke auf "Prüfen".</p>
+            </div>
+
+            <div class="button-area">
+                <button class="check-btn multiplication-color">Prüfen</button>
+                <button class="next-btn multiplication-color">Nächste Aufgabe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Schriftlich dividieren -->
+    <div id="divisionScreen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('startScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+        </div>
+
+        <div class="content" style="text-align: center; padding: 60px 20px;">
+            <h2 class="exercise-title division-color">Schriftlich dividieren</h2>
+            <p class="description" style="font-size: 1.5rem; margin-top: 40px;">📐 Inhalt noch im Aufbau 📐</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
+< <script src="script.js">
+    </script>
+    </body>
+
+    </html>
