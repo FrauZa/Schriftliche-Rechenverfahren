@@ -18,6 +18,22 @@
     --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Montessori-Stellenwertfarben (Farbige Unterstützung) */
+.color-ones {
+    color: #2E7D32 !important;
+    border-color: #2E7D32 !important;
+}
+
+.color-tens {
+    color: #1565C0 !important;
+    border-color: #1565C0 !important;
+}
+
+.color-hundreds {
+    color: #C62828 !important;
+    border-color: #C62828 !important;
+}
+
 /* ============================================
    Basis-Styles
    ============================================ */
@@ -847,4 +863,360 @@ body {
 #resultScreenSubtraction .final-score strong {
     color: var(--color-white) !important;
     text-decoration: underline;
+}
+
+/* ============================================
+   DIVISION – Mode Selection Container
+   ============================================ */
+.mode-selection-container.division-border {
+    border: 5px solid var(--color-division);
+    background-color: rgba(171, 71, 188, 0.1);
+}
+
+/* ============================================
+   DIVISION – Mode 1: Aufgabenanzeige & Antwort-Buttons
+   ============================================ */
+.division-task-display {
+    font-size: 2.8rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--color-text);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.division-task-display .task-number {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.division-task-display .task-operator {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-division);
+}
+
+.division-task-display .task-quotient-hidden {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-division);
+}
+
+.main-quotient-boxes {
+    display: inline-flex;
+    gap: 4px;
+    vertical-align: middle;
+}
+
+.division-task-display .task-number-fixed {
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.answer-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.answer-btn {
+    width: 100%;
+    min-height: 80px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    border: 3px solid var(--color-division);
+    border-radius: 15px;
+    background: #fff;
+    color: var(--color-division);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.answer-btn:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(171, 71, 188, 0.3);
+    background: rgba(171, 71, 188, 0.05);
+}
+
+.answer-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.answer-btn.correct {
+    background: #c8e6c9 !important;
+    border-color: #2e7d32 !important;
+    color: #1b5e20 !important;
+    animation: pulse-green 0.5s;
+}
+
+.answer-btn.wrong {
+    background: #ffcdd2 !important;
+    border-color: #c62828 !important;
+    color: #c62828 !important;
+    animation: shake 0.4s;
+}
+
+.answer-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+@keyframes pulse-green {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   DIVISION – Mode 2: Halbschriftliche Division
+   ============================================ */
+.partial-division-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.partial-division-row {
+    background: #fafafa;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 15px;
+}
+
+.partial-row-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.partial-dividend,
+.partial-quotient {
+    display: flex;
+    gap: 4px;
+}
+
+.partial-row-fields .task-operator {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-division);
+}
+
+.partial-row-fields .task-number-fixed {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+}
+
+/* ============================================
+   DIVISION – Mode 3: Schriftliche Division (Long Division)
+   ============================================ */
+.division-grid-container {
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.long-division-grid {
+    font-family: 'Courier New', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.long-division-grid .digit-box,
+.long-division-grid .result-box {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    border-radius: 8px;
+}
+
+.long-division-grid .digit-box {
+    background: #f5f5f5;
+    border: 2px solid #bdbdbd;
+}
+
+.long-division-grid .result-box {
+    background: #fff;
+    border: 2px solid #ccc;
+    /* Default border */
+}
+
+/* Explicitly override colors for Montessori classes in grid */
+.long-division-grid .color-ones {
+    color: #2E7D32 !important;
+    border-color: #2E7D32 !important;
+}
+
+.long-division-grid .color-tens {
+    color: #1565C0 !important;
+    border-color: #1565C0 !important;
+}
+
+.long-division-grid .color-hundreds {
+    color: #C62828 !important;
+    border-color: #C62828 !important;
+}
+
+.ld-header-row {
+    margin-bottom: 20px;
+}
+
+.ld-operator {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-division);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ld-divisor {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: #fff;
+    border: 2px solid #bdbdbd;
+    border-radius: 8px;
+    padding: 0 12px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ld-minus {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #d32f2f;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ld-line {
+    height: 3px;
+    background: #333;
+    border: none;
+    margin: 0;
+}
+
+/* ============================================
+   Division Result Screens
+   ============================================ */
+#resultScreenDivisionMode1 .content,
+#resultScreenDivisionMode2 .content,
+#resultScreenDivisionMode3 .content {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+#resultScreenDivisionMode1 .exercise-title,
+#resultScreenDivisionMode1 .final-score p,
+#divMode1MotivationalMessage,
+#resultScreenDivisionMode2 .exercise-title,
+#resultScreenDivisionMode2 .final-score p,
+#divMode2MotivationalMessage,
+#resultScreenDivisionMode3 .exercise-title,
+#resultScreenDivisionMode3 .final-score p,
+#divMode3MotivationalMessage {
+    color: var(--color-white) !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+#resultScreenDivisionMode1 .final-score strong,
+#resultScreenDivisionMode2 .final-score strong,
+#resultScreenDivisionMode3 .final-score strong {
+    color: var(--color-white) !important;
+    text-decoration: underline;
+}
+
+/* ============================================
+   Multiplication Result Screen (Transparent)
+   ============================================ */
+#resultScreenMultiplication .content {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+#resultScreenMultiplication .exercise-title,
+#resultScreenMultiplication .final-score p,
+#motivationalMessageMultiplication {
+    color: var(--color-white) !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+#resultScreenMultiplication .final-score strong {
+    color: var(--color-white) !important;
+    text-decoration: underline;
+}
+
+/* Responsive for Division */
+@media (max-width: 768px) {
+    .answer-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .answer-btn {
+        min-height: 65px;
+        font-size: 1.8rem;
+    }
+
+    .division-task-display {
+        font-size: 2rem;
+    }
+
+    .division-task-display .task-number {
+        font-size: 2.2rem;
+    }
+
+    .ld-header-row {
+        gap: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .answer-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+    }
+
+    .answer-btn {
+        min-height: 55px;
+        font-size: 1.5rem;
+    }
 }

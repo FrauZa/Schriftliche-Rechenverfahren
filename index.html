@@ -373,17 +373,319 @@
         </div>
     </div>
 
-    <!-- Screen: Schriftlich dividieren -->
-    <div id="divisionScreen" class="screen exercise-screen">
+    <!-- ============================================
+         Screen: Division Home (Auswahl der 3 Modi)
+         ============================================ -->
+    <div id="divisionScreen" class="screen">
         <div class="header">
             <button class="back-btn" onclick="showScreen('startScreen')">
                 <span class="arrow">←</span> Zurück
             </button>
         </div>
+        <div class="content">
+            <div class="mode-selection-container division-border">
+                <h2 class="exercise-title division-color">Division üben</h2>
+                <p class="description text-white">Wähle, wie du üben möchtest.</p>
 
-        <div class="content" style="text-align: center; padding: 60px 20px;">
-            <h2 class="exercise-title division-color">Schriftlich dividieren</h2>
-            <p class="description" style="font-size: 1.5rem; margin-top: 40px;">📐 Inhalt noch im Aufbau 📐</p>
+                <div class="button-grid">
+                    <button class="operation-btn division" onclick="startDivisionMode1()">
+                        <span class="emoji">🎮</span>
+                        <span class="text">Division üben<br><small
+                                style="font-size: 0.8rem; opacity: 0.9;">(3-Minuten-Spiel)</small></span>
+                    </button>
+                    <button class="operation-btn division" onclick="showScreen('divisionMode2SelectionScreen')">
+                        <span class="emoji">📐</span>
+                        <span class="text">Halbschriftliche Division</span>
+                    </button>
+                    <button class="operation-btn division" onclick="showScreen('divisionMode3SelectionScreen')">
+                        <span class="emoji">📝</span>
+                        <span class="text">Schriftliche Division</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         Screen: Mode 1 – Division üben (3-Minuten-Spiel)
+         ============================================ -->
+    <div id="divisionMode1Screen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="backFromDivisionMode1()">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="timer-display" id="timerDisplayDivisionMode1">03:00</div>
+            <div class="progress">Richtig: <span id="divisionMode1Score">0</span></div>
+        </div>
+
+        <div class="content">
+            <h2 class="exercise-title division-color">Division üben</h2>
+            <p class="description">Klicke auf die richtige Antwort!</p>
+
+            <div class="task-area" style="text-align: center;">
+                <div id="divisionMode1TaskDisplay" class="division-task-display">
+                    <!-- z.B. "24 : 4 = ?" -->
+                </div>
+            </div>
+
+            <div class="answer-grid" id="divisionMode1AnswerGrid">
+                <!-- Buttons 1–10 werden per JS erzeugt -->
+            </div>
+
+            <div class="feedback-area" id="divisionMode1Feedback" style="display:none;">
+                <p class="feedback-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Ergebnis Mode 1 -->
+    <div id="resultScreenDivisionMode1" class="screen">
+        <div class="content" style="text-align: center;">
+            <h2 class="exercise-title division-color">Runde beendet!</h2>
+            <div class="final-score" style="font-size: 2rem; margin: 30px 0;">
+                <span class="emoji" style="display:block; font-size:4rem; margin-bottom:10px;">🏆</span>
+                <p>Aufgaben: <strong id="divMode1Total"
+                        style="color:var(--color-division); font-size:2.5rem;">0</strong></p>
+                <p style="margin-top:10px;">Richtig: <strong id="divMode1Correct"
+                        style="color:#4CAF50; font-size:2rem;">0</strong>
+                    &nbsp;|&nbsp; Falsch: <strong id="divMode1Wrong" style="color:#F44336; font-size:2rem;">0</strong>
+                </p>
+                <p style="margin-top:10px;">Genauigkeit: <strong id="divMode1Accuracy"
+                        style="color:var(--color-division); font-size:2rem;">0%</strong></p>
+            </div>
+            <p id="divMode1MotivationalMessage" class="description" style="font-size: 1.5rem;">Gut gemacht!</p>
+
+            <div class="button-area">
+                <button class="check-btn division-color" onclick="showScreen('divisionScreen')">Nochmal spielen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         Screen: Mode 2 – Halbschriftliche Division (Auswahl)
+         ============================================ -->
+    <div id="divisionMode2SelectionScreen" class="screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('divisionScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+        </div>
+        <div class="content">
+            <div class="mode-selection-container division-border">
+                <h2 class="exercise-title division-color">Halbschriftliche Division</h2>
+                <p class="description text-white">Wähle den Zahlenraum.</p>
+
+                <div class="button-grid">
+                    <button class="operation-btn division" onclick="startDivisionMode2(100)">
+                        <span class="emoji">1️⃣</span>
+                        <span class="text">Bis 100<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 72 :
+                                3)</small></span>
+                    </button>
+                    <button class="operation-btn division" onclick="startDivisionMode2(1000)">
+                        <span class="emoji">2️⃣</span>
+                        <span class="text">Bis 1000<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 756 :
+                                4)</small></span>
+                    </button>
+                </div>
+
+                <div class="toggle-container-large">
+                    <button id="colorSupportBtnDivisionMode2" class="big-toggle-btn"
+                        onclick="toggleColorSupportDivisionMode2()">
+                        <span class="toggle-icon">🎨</span>
+                        <span class="toggle-text">Farbige Unterstützung einschalten</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Mode 2 – Halbschriftliche Division (Spiel) -->
+    <div id="divisionMode2Screen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="backFromDivisionMode2()">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="progress">Aufgabe <span id="divisionMode2TaskNum">1</span></div>
+        </div>
+
+        <div class="content">
+            <h2 class="exercise-title division-color" id="divisionMode2Title">Halbschriftliche Division</h2>
+
+            <div class="task-area">
+                <div id="divisionMode2MainTask" class="division-task-display" style="margin-bottom: 15px;">
+                    <!-- z.B. "72 : 3 = ?" -->
+                </div>
+                <div class="calc-line"></div>
+
+                <div id="divisionMode2Rows" class="partial-division-container">
+                    <!-- Teilaufgaben-Zeilen werden per JS erzeugt -->
+                </div>
+
+                <div class="button-area" style="margin-top: 15px;">
+                    <button class="check-btn division-color" id="addRowBtnMode2" onclick="addDivisionMode2Row()"
+                        style="font-size:1rem; padding:10px 20px;">➕ Zeile hinzufügen</button>
+                </div>
+            </div>
+
+            <!-- Drag Bar mit Ziffern 0–9 -->
+            <div class="drag-bar-container">
+                <div class="drag-bar" id="divisionMode2DragBar">
+                    <div class="draggable-number" draggable="true" data-value="0">0</div>
+                    <div class="draggable-number" draggable="true" data-value="1">1</div>
+                    <div class="draggable-number" draggable="true" data-value="2">2</div>
+                    <div class="draggable-number" draggable="true" data-value="3">3</div>
+                    <div class="draggable-number" draggable="true" data-value="4">4</div>
+                    <div class="draggable-number" draggable="true" data-value="5">5</div>
+                    <div class="draggable-number" draggable="true" data-value="6">6</div>
+                    <div class="draggable-number" draggable="true" data-value="7">7</div>
+                    <div class="draggable-number" draggable="true" data-value="8">8</div>
+                    <div class="draggable-number" draggable="true" data-value="9">9</div>
+                </div>
+            </div>
+
+            <div class="button-area">
+                <button class="check-btn division-color" id="checkBtnMode2"
+                    onclick="checkDivisionMode2()">Prüfen</button>
+                <button class="next-btn division-color" id="nextBtnMode2" onclick="nextDivisionMode2Task()"
+                    style="display:none;">Nächste Aufgabe</button>
+            </div>
+
+            <div class="feedback-area" id="divisionMode2Feedback" style="display:none;">
+                <p class="feedback-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Ergebnis Mode 2 -->
+    <div id="resultScreenDivisionMode2" class="screen">
+        <div class="content" style="text-align: center;">
+            <h2 class="exercise-title division-color">Übung beendet!</h2>
+            <div class="final-score" style="font-size: 2rem; margin: 30px 0;">
+                <span class="emoji" style="display:block; font-size:4rem; margin-bottom:10px;">⭐</span>
+                <p>Du hast <strong id="divMode2Score" style="color:var(--color-division); font-size:2.5rem;">0</strong>
+                    von
+                    <strong id="divMode2Total" style="color:var(--color-division); font-size:2.5rem;">0</strong>
+                    Aufgaben richtig gelöst.
+                </p>
+            </div>
+            <p id="divMode2MotivationalMessage" class="description" style="font-size: 1.5rem;">Gut gemacht!</p>
+            <div class="button-area">
+                <button class="check-btn division-color" onclick="showScreen('divisionMode2SelectionScreen')">Nochmal
+                    üben</button>
+                <button class="next-btn division-color" onclick="showScreen('divisionScreen')">Zurück zur
+                    Auswahl</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         Screen: Mode 3 – Schriftliche Division (Auswahl)
+         ============================================ -->
+    <div id="divisionMode3SelectionScreen" class="screen">
+        <div class="header">
+            <button class="back-btn" onclick="showScreen('divisionScreen')">
+                <span class="arrow">←</span> Zurück
+            </button>
+        </div>
+        <div class="content">
+            <div class="mode-selection-container division-border">
+                <h2 class="exercise-title division-color">Schriftliche Division</h2>
+                <p class="description text-white">Wähle den Zahlenraum.</p>
+
+                <div class="button-grid">
+                    <button class="operation-btn division" onclick="startDivisionMode3('modul1')">
+                        <span class="emoji">1️⃣</span>
+                        <span class="text">Modul 1: Erste Ziffer größer<br><small
+                                style="font-size: 0.8rem; opacity: 0.9;">(bis 100, z.B. 84 : 7)</small></span>
+                    </button>
+                    <button class="operation-btn division" onclick="startDivisionMode3('modul2')">
+                        <span class="emoji">2️⃣</span>
+                        <span class="text">Modul 2: Erste Ziffer kleiner<br><small
+                                style="font-size: 0.8rem; opacity: 0.9;">(bis 1000, z.B. 126 : 6)</small></span>
+                    </button>
+                    <button class="operation-btn division" onclick="startDivisionMode3('modul3')">
+                        <span class="emoji">3️⃣</span>
+                        <span class="text">Modul 3: Gemischt<br><small style="font-size: 0.8rem; opacity: 0.9;">(bis
+                                1000)</small></span>
+                    </button>
+                </div>
+
+                <div class="toggle-container-large">
+                    <button id="colorSupportBtnDivisionMode3" class="big-toggle-btn"
+                        onclick="toggleColorSupportDivisionMode3()">
+                        <span class="toggle-icon">🎨</span>
+                        <span class="toggle-text">Farbige Unterstützung einschalten</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Mode 3 – Schriftliche Division (Spiel) -->
+    <div id="divisionMode3Screen" class="screen exercise-screen">
+        <div class="header">
+            <button class="back-btn" onclick="backFromDivisionMode3()">
+                <span class="arrow">←</span> Zurück
+            </button>
+            <div class="timer-display" id="timerDisplayDivisionMode3">05:00</div>
+            <div class="progress">Aufgabe <span id="divisionMode3TaskNum">1</span></div>
+        </div>
+
+        <div class="content">
+            <h2 class="exercise-title division-color" id="divisionMode3Title">Schriftliche Division</h2>
+
+            <div class="task-area">
+                <div id="divisionMode3Grid" class="division-grid-container">
+                    <!-- Long division grid wird per JS erzeugt -->
+                </div>
+            </div>
+
+            <!-- Drag Bar mit Ziffern 0–9 -->
+            <div class="drag-bar-container">
+                <div class="drag-bar" id="divisionMode3DragBar">
+                    <div class="draggable-number" draggable="true" data-value="0">0</div>
+                    <div class="draggable-number" draggable="true" data-value="1">1</div>
+                    <div class="draggable-number" draggable="true" data-value="2">2</div>
+                    <div class="draggable-number" draggable="true" data-value="3">3</div>
+                    <div class="draggable-number" draggable="true" data-value="4">4</div>
+                    <div class="draggable-number" draggable="true" data-value="5">5</div>
+                    <div class="draggable-number" draggable="true" data-value="6">6</div>
+                    <div class="draggable-number" draggable="true" data-value="7">7</div>
+                    <div class="draggable-number" draggable="true" data-value="8">8</div>
+                    <div class="draggable-number" draggable="true" data-value="9">9</div>
+                </div>
+            </div>
+
+            <div class="button-area">
+                <button class="next-btn division-color" id="nextBtnMode3" onclick="nextDivisionMode3Task()"
+                    style="display:none;">Nächste Aufgabe</button>
+            </div>
+
+            <div class="feedback-area" id="divisionMode3Feedback" style="display:none;">
+                <p class="feedback-text"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen: Ergebnis Mode 3 -->
+    <div id="resultScreenDivisionMode3" class="screen">
+        <div class="content" style="text-align: center;">
+            <h2 class="exercise-title division-color">Übung beendet!</h2>
+            <div class="final-score" style="font-size: 2rem; margin: 30px 0;">
+                <span class="emoji" style="display:block; font-size:4rem; margin-bottom:10px;">⭐</span>
+                <p>Du hast <strong id="divMode3Score" style="color:var(--color-division); font-size:2.5rem;">0</strong>
+                    von
+                    <strong id="divMode3Total" style="color:var(--color-division); font-size:2.5rem;">0</strong>
+                    Aufgaben richtig gelöst.
+                </p>
+            </div>
+            <p id="divMode3MotivationalMessage" class="description" style="font-size: 1.5rem;">Gut gemacht!</p>
+            <div class="button-area">
+                <button class="check-btn division-color" onclick="showScreen('divisionMode3SelectionScreen')">Nochmal
+                    üben</button>
+                <button class="next-btn division-color" onclick="showScreen('divisionScreen')">Zurück zur
+                    Auswahl</button>
+            </div>
         </div>
     </div>
 
@@ -391,8 +693,3 @@
 </body>
 
 </html>
-< <script src="script.js">
-    </script>
-    </body>
-
-    </html>
