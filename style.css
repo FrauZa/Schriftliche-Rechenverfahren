@@ -1220,3 +1220,12 @@ body {
         font-size: 1.5rem;
     }
 }
+
+.touch-drag-clone {
+    position: fixed;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0.9;
+    transform: scale(1.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}

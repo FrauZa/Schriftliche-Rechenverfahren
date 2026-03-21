@@ -789,6 +789,77 @@ function checkFullCompletionSubtraction() {
    Input Method: Drag & Drop AND Click-to-Fill
    ============================================ */
 let draggedValue = null;
+let touchClone = null;
+
+function setupTouchDrag(elem, selectHandler) {
+    elem.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        draggedValue = elem.dataset.value;
+        if (selectHandler) selectHandler(draggedValue);
+
+        if (touchClone) {
+            touchClone.remove();
+        }
+        touchClone = elem.cloneNode(true);
+        touchClone.classList.add('touch-drag-clone');
+        
+        const rect = elem.getBoundingClientRect();
+        touchClone.style.width = rect.width + 'px';
+        touchClone.style.height = rect.height + 'px';
+        touchClone.style.left = (touch.clientX - rect.width / 2) + 'px';
+        touchClone.style.top = (touch.clientY - rect.height / 2) + 'px';
+        document.body.appendChild(touchClone);
+    }, { passive: false });
+
+    elem.addEventListener('touchmove', (e) => {
+        if (!touchClone) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        touchClone.style.left = (touch.clientX - touchClone.offsetWidth / 2) + 'px';
+        touchClone.style.top = (touch.clientY - touchClone.offsetHeight / 2) + 'px';
+        
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        if (target && (target.classList.contains('result-box') || target.classList.contains('carry-box') || target.id === 'activeCarryMultiplication' || target.classList.contains('ld-cell') || target.classList.contains('mode2-cell'))) {
+            target.classList.add('drag-over');
+        }
+    }, { passive: false });
+
+    elem.addEventListener('touchend', (e) => {
+        if (!touchClone) return;
+        const touch = e.changedTouches[0];
+        touchClone.remove();
+        touchClone = null;
+
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && draggedValue) {
+            if (target.classList.contains('result-box') || target.classList.contains('carry-box') || target.id === 'activeCarryMultiplication' || target.classList.contains('ld-cell') || target.classList.contains('mode2-cell')) {
+                if (!target.classList.contains('correct')) {
+                    if (document.getElementById('additionScreen').classList.contains('active')) {
+                        handleInput(target, draggedValue);
+                    } else if (document.getElementById('subtractionScreen').classList.contains('active')) {
+                        handleInputSubtraction(target, draggedValue);
+                    } else if (document.getElementById('multiplicationScreen').classList.contains('active')) {
+                        if (target.id === 'activeCarryMultiplication') {
+                            target.textContent = draggedValue;
+                        } else {
+                            handleInputMultiplication(target, draggedValue);
+                        }
+                    } else if (document.getElementById('divisionMode2Screen').classList.contains('active')) {
+                        target.textContent = draggedValue;
+                        target.classList.remove('wrong');
+                    } else if (document.getElementById('divisionMode3Screen').classList.contains('active')) {
+                        target.textContent = draggedValue;
+                        validateMode3Cell(target);
+                    }
+                }
+            }
+        }
+    });
+}
 
 function setupInputMethod() {
     document.querySelectorAll('.draggable-number').forEach(elem => {
@@ -797,14 +868,11 @@ function setupInputMethod() {
             e.dataTransfer.setData('text/plain', draggedValue);
             selectNumber(draggedValue);
         });
-        elem.addEventListener('touchstart', (e) => {
-            draggedValue = e.target.dataset.value;
-            selectNumber(draggedValue);
-        }, { passive: true });
         elem.addEventListener('click', () => {
             const val = elem.dataset.value;
             selectNumber(gameState.selectedNumber === val ? null : val);
         });
+        setupTouchDrag(elem, selectNumber);
     });
 }
 
@@ -1386,15 +1454,12 @@ function setupDivisionMode2DragBar() {
             selectNumberDivision(draggedValue, 'mode2');
         });
 
-        newElem.addEventListener('touchstart', (e) => {
-            draggedValue = newElem.dataset.value;
-            selectNumberDivision(draggedValue, 'mode2');
-        }, { passive: true });
-
         newElem.addEventListener('click', () => {
             const val = newElem.dataset.value;
             selectNumberDivision(divisionMode2State.selectedNumber === val ? null : val, 'mode2');
         });
+        
+        setupTouchDrag(newElem, (val) => selectNumberDivision(val, 'mode2'));
     });
     divisionMode2State.selectedNumber = null;
 }
@@ -1761,15 +1826,12 @@ function setupDivisionMode3DragBar() {
             selectNumberDivision(draggedValue, 'mode3');
         });
 
-        newElem.addEventListener('touchstart', (e) => {
-            draggedValue = newElem.dataset.value;
-            selectNumberDivision(draggedValue, 'mode3');
-        }, { passive: true });
-
         newElem.addEventListener('click', () => {
             const val = newElem.dataset.value;
             selectNumberDivision(divisionMode3State.selectedNumber === val ? null : val, 'mode3');
         });
+
+        setupTouchDrag(newElem, (val) => selectNumberDivision(val, 'mode3'));
     });
     divisionMode3State.selectedNumber = null;
 }
