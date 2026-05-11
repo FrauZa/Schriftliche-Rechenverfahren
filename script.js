@@ -1210,73 +1210,47 @@ let divisionMode3State = {
    DIVISION – Generator (shared)
    ============================================ */
 function generateDivisionTask(rangeOrModul) {
-    let rangeMax = 1000;
-    let modulType = null;
-    if (typeof rangeOrModul === 'string') {
-        modulType = rangeOrModul;
-    } else {
-        rangeMax = rangeOrModul;
-    }
-
+    let tasks = [];
     const divisorMin = 2, divisorMax = 9;
-    let divisor, dividend, quotient;
 
-    if (modulType === 'modul1') {
-        // Modul 1: Dividend ≤ 100, erste Ziffer > Divisor
-        // Das bedeutet der Quotient ist immer ≥ 10.
-        let attempts = 0;
-        do {
-            divisor = Math.floor(Math.random() * (divisorMax - divisorMin + 1)) + divisorMin;
-            // Wir suchen einen Dividenden, der durch divisor teilbar ist und die Bedingung erfüllt
-            // Erste Ziffer f > divisor. f kann also von divisor+1 bis 9 sein.
-            const minF = divisor + 1;
-            if (minF > 9) { // Falls divisor=9, gibt es keine Ziffer > 9. Wir nehmen divisor=2..8.
-                divisor = Math.floor(Math.random() * 7) + 2; // 2..8
+    if (rangeOrModul === 'modul1') {
+        // Modul 1: Dividend <= 99, erste Ziffer > Divisor -> Quotient >= 11
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            const minF = d + 1;
+            if (minF > 9) continue; // Divisor 9 hat keine Ziffer > 9
+            const minQuotient = Math.ceil((minF * 10) / d);
+            const maxQuotient = Math.floor(99 / d);
+            for (let q = minQuotient; q <= maxQuotient; q++) {
+                tasks.push({ divisor: d, quotient: q, dividend: d * q });
             }
-            const f = Math.floor(Math.random() * (9 - (divisor + 1) + 1)) + (divisor + 1);
-            const s = Math.floor(Math.random() * 10);
-            dividend = f * 10 + s;
-            quotient = dividend / divisor;
-            attempts++;
-        } while ((dividend % divisor !== 0 || dividend > 100) && attempts < 100);
-
-        // Fallback falls kein Treffer (sollte bei 100 Versuchen klappen)
-        if (dividend % divisor !== 0) {
-            divisor = 7;
-            dividend = 84;
-            quotient = 12;
         }
-    } else if (modulType === 'modul2') {
-        // Modul 2: 2-stelliges Ergebnis, erste Ziffer < Divisor
-        // Das bedeutet Dividend ist 3-stellig (100-999) und Q ist 2-stellig (10-99).
-        let attempts = 0;
-        do {
-            divisor = Math.floor(Math.random() * (divisorMax - divisorMin + 1)) + divisorMin;
-            // Wir wählen einen 2-stelligen Quotienten (11-99)
-            quotient = Math.floor(Math.random() * (99 - 11 + 1)) + 11;
-            dividend = divisor * quotient;
-            attempts++;
-        } while ((dividend < 100 || dividend > 999) && attempts < 100);
-
-        if (attempts >= 100) {
-            divisor = 6;
-            dividend = 126;
-            quotient = 21;
+    } else if (rangeOrModul === 'modul2') {
+        // Modul 2: 2-stelliges Ergebnis (11-99), erste Ziffer < Divisor -> Dividend 100-999
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            for (let q = 11; q <= 99; q++) {
+                const dividend = d * q;
+                if (dividend >= 100 && dividend <= 999) {
+                    const firstDigit = parseInt(dividend.toString()[0]);
+                    if (firstDigit < d) {
+                        tasks.push({ divisor: d, quotient: q, dividend: d * q });
+                    }
+                }
+            }
         }
     } else {
         // Modul 3 oder herkömmlicher Range (Halbschriftlich)
-        rangeMax = (modulType === 'modul3') ? 1000 : rangeMax;
-
-        // Für Modul 3 wollen wir Aufgaben, die mehrstufig sind (Quotient ≥ 11)
-        divisor = Math.floor(Math.random() * (divisorMax - divisorMin + 1)) + divisorMin;
-        const maxQuotient = Math.floor(rangeMax / divisor);
-        const minQuotient = 11;
-        const effectiveMin = Math.min(minQuotient, maxQuotient);
-        quotient = Math.floor(Math.random() * (maxQuotient - effectiveMin + 1)) + effectiveMin;
-        dividend = divisor * quotient;
+        let rangeMax = (rangeOrModul === 'modul3') ? 1000 : rangeOrModul;
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            const maxQuotient = Math.floor(rangeMax / d);
+            const minQuotient = 11; // Mehrstufig (Quotient >= 11)
+            for (let q = minQuotient; q <= maxQuotient; q++) {
+                tasks.push({ divisor: d, quotient: q, dividend: d * q });
+            }
+        }
     }
 
-    return { dividend, divisor, quotient };
+    if (tasks.length === 0) return { dividend: 84, divisor: 7, quotient: 12 };
+    return tasks[Math.floor(Math.random() * tasks.length)];
 }
 
 /* ============================================
@@ -1548,10 +1522,9 @@ function generateDivisionMode2Task() {
     // Create initial rows based on number of quotient digits
     const rowsContainer = document.getElementById('divisionMode2Rows');
     rowsContainer.innerHTML = '';
-    const numRows = task.quotient.toString().length;
-    for (let i = 0; i < numRows; i++) {
-        addDivisionMode2Row();
-    }
+    
+    // Wir zeigen nur EIN Start-Feld, die Kinder fügen Folgezeilen über den Button hinzu.
+    addDivisionMode2Row();
 }
 
 let mode2RowCount = 0;
@@ -1666,18 +1639,23 @@ function checkDivisionMode2() {
         }
 
         // Validate: subDividend divisible by divisor, subQuotient correct
-        const isRowCorrect = (subDividend % task.divisor === 0) &&
-            (subDividend / task.divisor === subQuotient) &&
-            (subDividend > 0);
+        // Auch wenn das Quotientenergebnis falsch ist, ist die Teilzerlegung selbst korrekt, sofern sie durch den Divisor teilbar ist.
+        const isSubDividendValid = (subDividend % task.divisor === 0) && (subDividend > 0);
+        const isSubQuotientValid = isSubDividendValid && (subDividend / task.divisor === subQuotient);
 
-        if (isRowCorrect) {
+        if (isSubDividendValid) {
             sdCells.forEach(c => { c.classList.remove('wrong'); c.classList.add('correct'); });
-            sqCells.forEach(c => { c.classList.remove('wrong'); c.classList.add('correct'); });
             sumSubDividends += subDividend;
-            sumSubQuotients += subQuotient;
         } else {
             allValid = false;
             sdCells.forEach(c => { c.classList.add('wrong'); c.classList.remove('correct'); });
+        }
+
+        if (isSubQuotientValid) {
+            sqCells.forEach(c => { c.classList.remove('wrong'); c.classList.add('correct'); });
+            sumSubQuotients += subQuotient;
+        } else {
+            allValid = false;
             sqCells.forEach(c => { c.classList.add('wrong'); c.classList.remove('correct'); });
         }
     });

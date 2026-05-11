@@ -623,72 +623,7 @@ body {
     }
 }
 
-/* ============================================
-   Responsive Design (Erweitert)
-   ============================================ */
-@media (max-width: 768px) {
-    .main-title {
-        font-size: 2rem;
-        margin-bottom: 40px;
-    }
-
-    .button-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .operation-btn {
-        min-height: 150px;
-    }
-
-    .exercise-screen .content {
-        padding: 25px;
-    }
-
-    .exercise-title {
-        font-size: 1.8rem;
-    }
-
-    .button-area {
-        flex-direction: column;
-    }
-
-    .check-btn,
-    .next-btn {
-        width: 100%;
-    }
-
-    .timer-display {
-        font-size: 1.5rem;
-        padding: 5px 10px;
-    }
-
-    .draggable-number {
-        width: 45px;
-        height: 60px;
-        font-size: 1.8rem;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .digit-box,
-    .result-box {
-        width: 40px;
-        height: 50px;
-        font-size: 1.6rem;
-    }
-
-    .carry-box {
-        width: 35px;
-        height: 35px;
-        font-size: 1.2rem;
-    }
-
-    .written-calculation {
-        font-size: 1.6rem;
-    }
-}
+/* Media Queries wurden ans Ende der Datei verschoben, um korrekte Spezifizität (Overrides) sicherzustellen */
 
 /* Farbige Unterstützung (Montessori-Farben) */
 .digit-box.color-ones {
@@ -1183,11 +1118,94 @@ body {
     text-decoration: underline;
 }
 
-/* Responsive for Division */
-@media (max-width: 768px) {
+/* ============================================
+   Responsive Design (PC, Tablet, Mobile)
+   ============================================ */
+
+/* Tablet & Small Desktop (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+
+    .button-grid {
+        gap: 20px;
+    }
+
+    .operation-btn {
+        min-width: 150px;
+        min-height: 150px;
+    }
+
+    .exercise-screen .content {
+        padding: 30px;
+    }
+
     .answer-grid {
         grid-template-columns: repeat(5, 1fr);
-        gap: 10px;
+        gap: 12px;
+    }
+}
+
+/* Tablet Portrait & Mobile Landscape (max-width: 768px) */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+
+    .button-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .operation-btn {
+        min-height: 100px;
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 15px 25px;
+        gap: 20px;
+    }
+
+    .operation-btn .emoji {
+        font-size: 2.5rem;
+    }
+
+    .operation-btn .text {
+        font-size: 1.2rem;
+        text-align: left;
+    }
+
+    .exercise-screen .content {
+        padding: 20px;
+    }
+
+    .exercise-title {
+        font-size: 1.8rem;
+    }
+
+    .button-area {
+        flex-direction: column;
+    }
+
+    .check-btn,
+    .next-btn {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .timer-display {
+        font-size: 1.5rem;
+        padding: 5px 10px;
+    }
+
+    .draggable-number {
+        width: 50px;
+        height: 65px;
+        font-size: 2rem;
+    }
+
+    .answer-grid {
         padding: 10px;
     }
 
@@ -1209,15 +1227,70 @@ body {
     }
 }
 
+/* Mobile Portrait (max-width: 480px) */
 @media (max-width: 480px) {
+    .main-title {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+    }
+
+    .operation-btn {
+        padding: 12px 20px;
+    }
+
+    .operation-btn .emoji {
+        font-size: 2rem;
+    }
+
+    .operation-btn .text {
+        font-size: 1.1rem;
+    }
+
+    .digit-box,
+    .result-box,
+    .long-division-grid .digit-box,
+    .long-division-grid .result-box {
+        width: 40px;
+        height: 50px;
+        font-size: 1.6rem;
+    }
+
+    .carry-box {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+
+    .written-calculation,
+    .long-division-grid {
+        font-size: 1.6rem;
+    }
+
+    .ld-divisor {
+        min-height: 40px;
+        font-size: 1.8rem;
+        padding: 0 8px;
+    }
+
+    .ld-operator,
+    .ld-minus {
+        font-size: 1.8rem;
+    }
+
+    .draggable-number {
+        width: 45px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+
     .answer-grid {
-        grid-template-columns: repeat(5, 1fr);
         gap: 8px;
     }
 
     .answer-btn {
         min-height: 55px;
         font-size: 1.5rem;
+        padding: 5px;
     }
 }
 
