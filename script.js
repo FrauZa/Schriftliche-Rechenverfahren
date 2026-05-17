@@ -1189,7 +1189,11 @@ let divisionMode2State = {
     currentTask: null,
     score: 0,
     total: 0,
-    startTs: null
+    startTs: null,
+    coachActive: false,
+    coachStep: 0,
+    coachSteps: [],
+    selectedNumber: null
 };
 
 let divisionMode3State = {
@@ -1234,6 +1238,62 @@ function generateDivisionTask(rangeOrModul) {
                     if (firstDigit < d) {
                         tasks.push({ divisor: d, quotient: q, dividend: d * q });
                     }
+                }
+            }
+        }
+    } else if (rangeOrModul === 'type-2digit-greater') {
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            for (let q = 11; q <= 49; q++) {
+                const dividend = d * q;
+                if (dividend >= 10 && dividend <= 99) {
+                    const firstDigit = parseInt(dividend.toString()[0]);
+                    if (firstDigit >= d) {
+                        tasks.push({ divisor: d, quotient: q, dividend });
+                    }
+                }
+            }
+        }
+    } else if (rangeOrModul === 'type-2digit-mixed') {
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            // Für gemischte 2-stellige Aufgaben erlauben wir auch q < 11 (kleines 1x1), 
+            // damit es überhaupt Aufgaben gibt, bei denen die erste Ziffer kleiner als der Teiler ist.
+            for (let q = 2; q <= 49; q++) {
+                const dividend = d * q;
+                if (dividend >= 10 && dividend <= 99) {
+                    tasks.push({ divisor: d, quotient: q, dividend });
+                }
+            }
+        }
+    } else if (rangeOrModul === 'type-3digit-greater') {
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            for (let q = 11; q <= 499; q++) {
+                const dividend = d * q;
+                if (dividend >= 100 && dividend <= 999) {
+                    const firstDigit = parseInt(dividend.toString()[0]);
+                    if (firstDigit >= d) {
+                        tasks.push({ divisor: d, quotient: q, dividend });
+                    }
+                }
+            }
+        }
+    } else if (rangeOrModul === 'type-3digit-smaller') {
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            for (let q = 11; q <= 499; q++) {
+                const dividend = d * q;
+                if (dividend >= 100 && dividend <= 999) {
+                    const firstDigit = parseInt(dividend.toString()[0]);
+                    if (firstDigit < d) {
+                        tasks.push({ divisor: d, quotient: q, dividend });
+                    }
+                }
+            }
+        }
+    } else if (rangeOrModul === 'type-3digit-mixed') {
+        for (let d = divisorMin; d <= divisorMax; d++) {
+            for (let q = 11; q <= 499; q++) {
+                const dividend = d * q;
+                if (dividend >= 100 && dividend <= 999) {
+                    tasks.push({ divisor: d, quotient: q, dividend });
                 }
             }
         }
@@ -1409,8 +1469,16 @@ function startDivisionMode2(rangeMax) {
     divisionMode2State.startTs = Date.now();
 
     showScreen('divisionMode2Screen');
-    document.getElementById('divisionMode2Title').textContent =
-        `Halbschriftliche Division (bis ${rangeMax})`;
+    
+    let title = 'Halbschriftliche Division';
+    if (rangeMax === 'type-2digit-greater') title = 'Zweistellig (Ziffer größer)';
+    else if (rangeMax === 'type-2digit-mixed') title = 'Zweistellig (gemischt)';
+    else if (rangeMax === 'type-3digit-greater') title = 'Dreistellig (Ziffer größer)';
+    else if (rangeMax === 'type-3digit-smaller') title = 'Dreistellig (Ziffer kleiner)';
+    else if (rangeMax === 'type-3digit-mixed') title = 'Dreistellig (gemischt)';
+    else title = `Halbschriftliche Division (bis ${rangeMax})`;
+    
+    document.getElementById('divisionMode2Title').textContent = title;
 
     setupDivisionMode2DragBar();
     generateDivisionMode2Task();
@@ -1465,16 +1533,29 @@ function generateDivisionMode2Task() {
 
     // Build dividend digits with color support
     const dividendStr = task.dividend.toString();
+    const firstDigit = parseInt(dividendStr[0]);
     let dividendHtml = '';
     dividendStr.split('').forEach((d, i) => {
         const pos = dividendStr.length - 1 - i;
         let colorClass = '';
+        let inlineStyle = '';
         if (divisionMode2State.colorSupport) {
             if (pos === 0) colorClass = ' color-ones';
             else if (pos === 1) colorClass = ' color-tens';
             else if (pos === 2) colorClass = ' color-hundreds';
         }
-        dividendHtml += `<span class="task-number${colorClass}">${d}</span>`;
+        
+        if (firstDigit < task.divisor) {
+            if (i === 0 || i === 1) {
+                inlineStyle = 'color: #42A5F5 !important;';
+            }
+        } else {
+            if (i === 0) {
+                inlineStyle = 'color: #42A5F5 !important;';
+            }
+        }
+        
+        dividendHtml += `<span class="task-number${colorClass}" style="${inlineStyle}">${d}</span>`;
     });
 
     // Build quotient input boxes
@@ -1491,7 +1572,7 @@ function generateDivisionMode2Task() {
         quotientBoxes += `<div class="result-box small mode2-cell mode2-quotient-cell${colorClass}" data-field="mainQuotient" data-expected="${d}" data-digit="${i}"></div>`;
     });
 
-    mainTaskEl.innerHTML = `<span class="task-number-container">${dividendHtml}</span> <span class="task-operator">:</span> <span class="task-number">${task.divisor}</span> <span class="task-operator">=</span> <span class="main-quotient-boxes">${quotientBoxes}</span>`;
+    mainTaskEl.innerHTML = `<span class="task-number-container">${dividendHtml}</span> <span class="task-operator">:</span> <span class="task-number" style="color:var(--color-division);">${task.divisor}</span> <span class="task-operator">=</span> <span class="main-quotient-boxes">${quotientBoxes}</span>`;
 
     // Setup click and drop handlers for quotient boxes
     mainTaskEl.querySelectorAll('.mode2-quotient-cell').forEach(cell => {
@@ -1518,6 +1599,7 @@ function generateDivisionMode2Task() {
     document.getElementById('divisionMode2Feedback').style.display = 'none';
     document.getElementById('checkBtnMode2').style.display = '';
     document.getElementById('nextBtnMode2').style.display = 'none';
+    document.getElementById('addRowBtnMode2').style.display = '';
 
     // Create initial rows based on number of quotient digits
     const rowsContainer = document.getElementById('divisionMode2Rows');
@@ -1525,6 +1607,11 @@ function generateDivisionMode2Task() {
     
     // Wir zeigen nur EIN Start-Feld, die Kinder fügen Folgezeilen über den Button hinzu.
     addDivisionMode2Row();
+
+    // Lerncoach initialisieren, falls aktiv
+    if (divisionMode2State.coachActive) {
+        initCoachForTask(task);
+    }
 }
 
 let mode2RowCount = 0;
@@ -1698,6 +1785,14 @@ function checkDivisionMode2() {
         document.getElementById('checkBtnMode2').style.display = 'none';
         document.getElementById('nextBtnMode2').style.display = '';
         document.getElementById('addRowBtnMode2').style.display = 'none';
+
+        if (divisionMode2State.coachActive) {
+            const msgEl = document.getElementById('coachMessage');
+            msgEl.innerHTML = "Perfekt gelöst! Du bist ein echter Mathe-Profi! 🏆";
+            const weiterBtn = document.getElementById('coachWeiterBtn');
+            weiterBtn.disabled = true;
+            weiterBtn.innerHTML = "Fertig! 🏁";
+        }
     } else if (allValid) {
         // Rows individually correct but sums don't match
         feedbackEl.style.display = 'block';
@@ -1719,6 +1814,222 @@ function nextDivisionMode2Task() {
 
 function backFromDivisionMode2() {
     showScreen('divisionMode2SelectionScreen');
+}
+
+/* ============================================
+   LERNCOACH – Halbschriftliche Division
+   ============================================ */
+
+function toggleCoach() {
+    divisionMode2State.coachActive = !divisionMode2State.coachActive;
+    const btn = document.getElementById('coachToggleBtn');
+    const panel = document.getElementById('coachPanel');
+
+    if (divisionMode2State.coachActive) {
+        btn.classList.add('active');
+        btn.querySelector('.coach-label').textContent = 'Coach aktiv';
+        if (divisionMode2State.currentTask) {
+            initCoachForTask(divisionMode2State.currentTask);
+        }
+    } else {
+        btn.classList.remove('active');
+        btn.querySelector('.coach-label').textContent = 'Lerncoach';
+        panel.classList.remove('visible');
+    }
+}
+
+function evaluateCurrentRows() {
+    const task = divisionMode2State.currentTask;
+    const rowsContainer = document.getElementById('divisionMode2Rows');
+    const rows = rowsContainer.querySelectorAll('.partial-division-row');
+    
+    let allValid = true;
+    let sumSubDividends = 0;
+    let sumSubQuotients = 0;
+    let hasEmptyFields = false;
+    let wrongFieldsFound = false;
+
+    rows.forEach(row => {
+        // Read subDividend
+        const sdCells = row.querySelectorAll('[data-field="subDividend"]');
+        let sdStr = '';
+        sdCells.forEach(c => { sdStr += c.textContent.trim(); });
+        
+        // Read subQuotient
+        const sqCells = row.querySelectorAll('[data-field="subQuotient"]');
+        let sqStr = '';
+        sqCells.forEach(c => { sqStr += c.textContent.trim(); });
+
+        if (sdStr === '' && sqStr === '') {
+            hasEmptyFields = true;
+            return;
+        }
+
+        if (sdStr === '' || sqStr === '') {
+            hasEmptyFields = true;
+            return;
+        }
+
+        const subDividend = parseInt(sdStr) || 0;
+        const subQuotient = parseInt(sqStr) || 0;
+
+        const isSubDividendValid = (subDividend % task.divisor === 0) && (subDividend > 0);
+        const isSubQuotientValid = isSubDividendValid && (subDividend / task.divisor === subQuotient);
+
+        if (isSubDividendValid) {
+            sdCells.forEach(c => { c.classList.remove('wrong'); c.classList.add('correct'); });
+            sumSubDividends += subDividend;
+        } else {
+            allValid = false;
+            sdCells.forEach(c => { c.classList.add('wrong'); c.classList.remove('correct'); });
+            wrongFieldsFound = true;
+        }
+
+        if (isSubQuotientValid) {
+            sqCells.forEach(c => { c.classList.remove('wrong'); c.classList.add('correct'); });
+            sumSubQuotients += subQuotient;
+        } else {
+            allValid = false;
+            sqCells.forEach(c => { c.classList.add('wrong'); c.classList.remove('correct'); });
+            wrongFieldsFound = true;
+        }
+    });
+
+    return {
+        allValid,
+        sumSubDividends,
+        sumSubQuotients,
+        hasEmptyFields,
+        wrongFieldsFound,
+        remaining: task.dividend - sumSubDividends
+    };
+}
+
+function initCoachForTask(task) {
+    divisionMode2State.coachPhase = 'START';
+    
+    const panel = document.getElementById('coachPanel');
+    panel.classList.remove('visible');
+    panel.style.animation = 'none';
+    void panel.offsetWidth; // reflow
+    panel.style.animation = '';
+    panel.classList.add('visible');
+
+    const msgEl = document.getElementById('coachMessage');
+    msgEl.innerHTML = `Ich helfe dir! Drücke auf <strong>Weiter</strong>, wenn du bereit bist. 👋`;
+    
+    const weiterBtn = document.getElementById('coachWeiterBtn');
+    weiterBtn.disabled = false;
+    weiterBtn.innerHTML = 'Weiter →';
+}
+
+function coachWeiter() {
+    const task = divisionMode2State.currentTask;
+    if (!task) return;
+
+    const msgEl = document.getElementById('coachMessage');
+    const weiterBtn = document.getElementById('coachWeiterBtn');
+
+    if (divisionMode2State.coachPhase === 'START') {
+        divisionMode2State.coachPhase = 'WAITING_FOR_ROW';
+        
+        const dividendStr = task.dividend.toString();
+        const firstDigit = parseInt(dividendStr[0]);
+        const divisor = task.divisor;
+        const blueColor = '#42A5F5';
+        const purpleColor = 'var(--color-division)';
+
+        let baseNumber;
+        let targetStr;
+        let power;
+        let tipHtml = '';
+
+        if (firstDigit >= divisor) {
+            targetStr = firstDigit.toString();
+            power = dividendStr.length - 1;
+            baseNumber = parseInt(targetStr) * Math.pow(10, power);
+            let zahlTyp = power === 1 ? "Zehnerzahl" : (power === 2 ? "Hunderterzahl" : "Zahl");
+            tipHtml = `Schau dir die erste Ziffer an: <strong style="color:${blueColor};">${firstDigit}</strong>. Ist sie größer als oder gleich <strong style="color:${purpleColor};">${divisor}</strong>, lege direkt los. Welche Zahl (${zahlTyp}) aus dem 1 mal 1 der <strong style="color:${purpleColor};">${divisor}</strong> passt in die <strong style="color:${blueColor};">${baseNumber}</strong>?<br><br>Trage deine erste Teilaufgabe ein und klicke auf <strong>Weiter</strong>.`;
+        } else {
+            targetStr = dividendStr.length >= 2 ? dividendStr.substring(0, 2) : dividendStr;
+            power = dividendStr.length - targetStr.length;
+            baseNumber = parseInt(targetStr) * Math.pow(10, power);
+            let zahlTyp = power === 1 ? "Zehnerzahl" : (power === 2 ? "Hunderterzahl" : "Zahl");
+            tipHtml = `Schau dir die erste Ziffer an: <strong style="color:${blueColor};">${firstDigit}</strong>. Ist sie kleiner als <strong style="color:${purpleColor};">${divisor}</strong>, nimm die ersten beiden Ziffern zusammen: <strong style="color:${blueColor};">${targetStr}</strong>. Welche Zahl (${zahlTyp}) aus dem 1 mal 1 der <strong style="color:${purpleColor};">${divisor}</strong> passt in die <strong style="color:${blueColor};">${baseNumber}</strong>?<br><br>Trage deine erste Teilaufgabe ein und klicke auf <strong>Weiter</strong>.`;
+        }
+
+        msgEl.classList.add('fade-out');
+        setTimeout(() => {
+            msgEl.innerHTML = tipHtml;
+            msgEl.classList.remove('fade-out');
+        }, 240);
+        return;
+    }
+
+    if (divisionMode2State.coachPhase === 'WAITING_FOR_ROW' || divisionMode2State.coachPhase === 'NEXT_ROW_PROMPT') {
+        const evalResult = evaluateCurrentRows();
+
+        if (evalResult.hasEmptyFields) {
+            msgEl.classList.add('fade-out');
+            setTimeout(() => {
+                msgEl.innerHTML = "Bitte fülle erst alle Felder der aktuellen Teilaufgabe aus! ✏️";
+                msgEl.classList.remove('fade-out');
+            }, 240);
+            return;
+        }
+
+        if (evalResult.wrongFieldsFound) {
+            msgEl.classList.add('fade-out');
+            setTimeout(() => {
+                msgEl.innerHTML = "In deiner Teilaufgabe stimmt etwas noch nicht ganz. Überprüfe die roten Felder! ✏️";
+                msgEl.classList.remove('fade-out');
+            }, 240);
+            return;
+        }
+
+        // Row is correct
+        const remaining = evalResult.remaining;
+        const blueColor = '#42A5F5';
+        const purpleColor = 'var(--color-division)';
+
+        if (remaining > 0) {
+            divisionMode2State.coachPhase = 'NEXT_ROW_PROMPT';
+
+            let remStr = remaining.toString();
+            let remFirstDigit = parseInt(remStr[0]);
+            let remBaseNumber;
+            if (remFirstDigit >= task.divisor) {
+                let remTargetStr = remFirstDigit.toString();
+                let remPower = remStr.length - 1;
+                remBaseNumber = parseInt(remTargetStr) * Math.pow(10, remPower);
+            } else {
+                let remTargetStr = remStr.length >= 2 ? remStr.substring(0, 2) : remStr;
+                let remPower = remStr.length - remTargetStr.length;
+                remBaseNumber = parseInt(remTargetStr) * Math.pow(10, remPower);
+            }
+
+            const tipHtml = `Klasse! Es sind noch <strong>${remaining}</strong> übrig. Welche Zahl aus dem 1 mal 1 von <strong style="color:${purpleColor};">${task.divisor}</strong> passt in die <strong style="color:${blueColor};">${remBaseNumber}</strong>?<br><br>Klicke auf <strong>➕ Zeile hinzufügen</strong>, trage deine nächste Teilaufgabe ein und klicke auf <strong>Weiter</strong>.`;
+            
+            msgEl.classList.add('fade-out');
+            setTimeout(() => {
+                msgEl.innerHTML = tipHtml;
+                msgEl.classList.remove('fade-out');
+            }, 240);
+        } else if (remaining === 0) {
+            // remaining === 0
+            divisionMode2State.coachPhase = 'SUMMING_UP';
+            const tipHtml = `Super! Du hast alles perfekt aufgeteilt.<br><br>Addiere nun alle Ergebnisse der Teilaufgaben und trage das Gesamtergebnis oben im Antwortfeld ein. Klicke dann ganz unten auf <strong>Prüfen</strong>! 🚀`;
+
+            msgEl.classList.add('fade-out');
+            setTimeout(() => {
+                msgEl.innerHTML = tipHtml;
+                msgEl.classList.remove('fade-out');
+            }, 240);
+            
+            weiterBtn.disabled = true;
+            weiterBtn.innerHTML = 'Fertig! 🏁';
+        }
+    }
 }
 
 /* ============================================

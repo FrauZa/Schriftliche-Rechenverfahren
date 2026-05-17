@@ -473,18 +473,24 @@
         <div class="content">
             <div class="mode-selection-container division-border">
                 <h2 class="exercise-title division-color">Halbschriftliche Division</h2>
-                <p class="description text-white">Wähle den Zahlenraum.</p>
+                <p class="description text-white">Wähle den Aufgabentyp.</p>
 
-                <div class="button-grid">
-                    <button class="operation-btn division" onclick="startDivisionMode2(100)">
+                <div class="button-grid" style="display: flex; flex-direction: column; gap: 15px;">
+                    <button class="operation-btn division" onclick="startDivisionMode2('type-2digit-greater')">
                         <span class="emoji">1️⃣</span>
-                        <span class="text">Bis 100<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 72 :
-                                3)</small></span>
+                        <span class="text">Zweistellige Zahl (erste Ziffer größer)<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 72 : 3)</small></span>
                     </button>
-                    <button class="operation-btn division" onclick="startDivisionMode2(1000)">
+                    <button class="operation-btn division" onclick="startDivisionMode2('type-3digit-greater')">
                         <span class="emoji">2️⃣</span>
-                        <span class="text">Bis 1000<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 756 :
-                                4)</small></span>
+                        <span class="text">Dreistellige Zahl (erste Ziffer größer)<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 846 : 3)</small></span>
+                    </button>
+                    <button class="operation-btn division" onclick="startDivisionMode2('type-3digit-smaller')">
+                        <span class="emoji">3️⃣</span>
+                        <span class="text">Dreistellige Zahl (erste Ziffer kleiner)<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 126 : 6)</small></span>
+                    </button>
+                    <button class="operation-btn division" onclick="startDivisionMode2('type-3digit-mixed')">
+                        <span class="emoji">4️⃣</span>
+                        <span class="text">Dreistellige Zahl (gemischt)<br><small style="font-size: 0.8rem; opacity: 0.9;">(z.B. 455 : 5)</small></span>
                     </button>
                 </div>
 
@@ -505,11 +511,28 @@
             <button class="back-btn" onclick="backFromDivisionMode2()">
                 <span class="arrow">←</span> Zurück
             </button>
+            <button id="coachToggleBtn" class="coach-header-btn" onclick="toggleCoach()">
+                <span class="coach-icon">🧑‍🏫</span>
+                <span class="coach-label">Lerncoach</span>
+            </button>
             <div class="progress">Aufgabe <span id="divisionMode2TaskNum">1</span></div>
         </div>
 
         <div class="content">
             <h2 class="exercise-title division-color" id="divisionMode2Title">Halbschriftliche Division</h2>
+
+            <!-- Lerncoach Panel -->
+            <div id="coachPanel" class="coach-panel">
+                <div class="coach-panel-inner">
+                    <div class="coach-avatar">🧑‍🏫</div>
+                    <div class="coach-text-area">
+                        <div class="coach-message" id="coachMessage">Drücke auf Weiter, wenn du bereit bist! 👋</div>
+                        <div class="coach-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="coach-weiter-btn" id="coachWeiterBtn" onclick="coachWeiter()">Weiter →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="task-area">
                 <div id="divisionMode2MainTask" class="division-task-display" style="margin-bottom: 15px;">
